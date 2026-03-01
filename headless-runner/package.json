@@ -1,0 +1,14 @@
+{
+  "name": "touch-mouse-headless-runner",
+  "version": "1.0.0",
+  "description": "ヘッドレスブラウザで学習を回し、終了時に学習データを自動エクスポート",
+  "private": true,
+  "scripts": {
+    "start": "node run-learning.js",
+    "learning": "node run-learning.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "puppeteer": "^21.0.0"
+  }
+}

@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs and temp
+*.log
+npm-debug.log*
+.npm
+.tmp
+tmp/
+temp/
+
+# Environment (if added later)
+.env
+.env.local
+.env.*.local
+
+# Optional: 学習データのエクスポートJSON（リポジトリに含めたくない場合）
+# export.json
+# *-after.json
+# previous.json
