@@ -37,9 +37,9 @@ const CONFIG = {
   RL: {
     LEARNING_RATE: 0.1,
     DISCOUNT: 0.95,
-    EPSILON_MIN: 0.1,
+    EPSILON_MIN: 0.05,
     EPSILON_DECAY: 0.998,
-    EPSILON_INITIAL: 0.1, // 探索の割合 10%。ランダム行動で多様な移動量を試す
+    EPSILON_INITIAL: 0.05, // 探索の割合 5%。ランダム行動で多様な移動量を試す
     STATE_BINS: 5,  // ばらつきを離散化する区間数
     // 2乗距離を用いた方向スコア時: raw（8スコアのrange）を [SPREAD_RAW_MIN, SPREAD_RAW_MAX] で線形写像。遠い→raw大→0、近い→raw小→1
     SPREAD_RAW_MIN: 5,
@@ -58,26 +58,27 @@ const CONFIG = {
 };
 
 /**
- * フィールドサイズから移動量候補を算出（慎重〜大胆を等比数列で配分）
- * 最小1px、最大は短辺の20%程度まで。段階を多くして追い抜き・行き過ぎの振動を抑える。
+ * フィールドサイズから移動量候補を算出（対数的に「半分ずつ」配分）
+ * 最大 = 長辺の50%。そこから 1/2, 1/4, 1/8, ... と半分ずつ減らして 1px まで。
+ * 端から端まで少ないステップで届くようにしつつ、細かい段階でリカバリーしやすくする。
  */
 function computeMoveAmounts() {
   const minMove = 1;
-  const shortSide = Math.min(CONFIG.FIELD_WIDTH, CONFIG.FIELD_HEIGHT);
-  const maxMove = Math.max(minMove, Math.round(shortSide * 0.2));
-  const count = 13; // グラデーションを細かくし、リカバリーしやすい移動量を用意
+  const longSide = Math.max(CONFIG.FIELD_WIDTH, CONFIG.FIELD_HEIGHT);
+  const maxMove = Math.max(minMove, Math.round(longSide * 0.5));
   const amounts = [];
   const seen = new Set();
-  for (let i = 0; i < count; i++) {
-    const t = count > 1 ? i / (count - 1) : 1;
-    const v = minMove * Math.pow(maxMove / minMove, t);
-    const rounded = Math.max(1, Math.round(v));
+  let v = maxMove;
+  while (v >= minMove) {
+    const rounded = Math.max(minMove, Math.round(v));
     if (!seen.has(rounded)) {
       seen.add(rounded);
       amounts.push(rounded);
     }
+    v = v / 2;
   }
-  return amounts.length > 0 ? amounts.sort((a, b) => a - b) : [1];
+  if (!seen.has(minMove)) amounts.push(minMove);
+  return amounts.length > 0 ? amounts.sort((a, b) => a - b) : [minMove];
 }
 
 CONFIG.MOVE_AMOUNTS = computeMoveAmounts();
