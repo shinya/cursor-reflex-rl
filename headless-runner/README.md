@@ -43,7 +43,7 @@ IMPORT_PATH=../path/to/previous-export.json npm start
 
 ```bash
 # リポジトリルート (touch-mouse/) で
-docker build -f headless-runner/Dockerfile -t touch-mouse-learning .
+docker build --no-cache -f headless-runner/Dockerfile -t touch-mouse-learning .
 ```
 
 **実行例**: 2時間学習し、カレントディレクトリに `export.json` を出力。
